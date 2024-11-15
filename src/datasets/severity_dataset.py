@@ -1,4 +1,4 @@
-from typing import Tuple, List
+from typing import Dict, Any, List
 
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
@@ -63,7 +63,7 @@ class SeverityDataset:
     def get_columns_by_types(
         self,
         dataset: pd.DataFrame,
-    ) -> Tuple[List[str], List[str]]:
+    ) -> Dict[str, List[str]]:
         continuous_columns = []
         categorical_columns = []
         for column in dataset.columns:
@@ -71,13 +71,20 @@ class SeverityDataset:
                 continuous_columns.append(column)
             else:
                 categorical_columns.append(column)
-        return continuous_columns, categorical_columns
+        return {
+            "continuous_columns": continuous_columns,
+            "categorical_columns": categorical_columns,
+        }
 
     def interpolate_dataset(
         self,
         dataset: pd.DataFrame,
     ) -> pd.DataFrame:
-        continuous_columns, categorical_columns = self.get_columns_by_types(dataset)
+        columns = self.get_columns_by_types(dataset)
+        continuous_columns, categorical_columns = (
+            columns["continuous_columns"],
+            columns["categorical_columns"],
+        )
         dataset[continuous_columns] = dataset[continuous_columns].interpolate(
             method="linear",
             axis=0,
@@ -98,7 +105,7 @@ class SeverityDataset:
     def get_preprocessed_dataset(
         self,
         dataset: pd.DataFrame,
-    ) -> Tuple[pd.DataFrame, pd.Series]:
+    ) -> Dict[str, Any]:
         if self.mode in ["train", "test", "tune"]:
             data = dataset.drop(
                 [self.label_column_name],
