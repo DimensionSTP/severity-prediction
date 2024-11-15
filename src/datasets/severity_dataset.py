@@ -69,9 +69,21 @@ class SeverityDataset:
             self.data_path,
             self.columns_mapping_file_name,
         )
-        with open(columns_mapping_file_path, "r", encoding="utf-8") as f:
-            loaded_mapping = json.load(f)
-        dataset = dataset.rename(columns=loaded_mapping)
+
+        try:
+            with open(columns_mapping_file_path, "r", encoding="utf-8") as f:
+                mapping_info = json.load(f)
+        except FileNotFoundError:
+            raise ValueError(f"Mapping file not found: {columns_mapping_file_path}")
+
+        columns_mapping = {
+            column: mapping_info.get(
+                column,
+                column,
+            )
+            for column in dataset.columns
+        }
+        dataset = dataset.rename(columns=columns_mapping)
         return dataset
 
     def select_features(
