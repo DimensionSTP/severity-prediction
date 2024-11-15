@@ -20,7 +20,7 @@ objective_name: reg:squarederror
 metric_name: rmse
 
 model_name: XGBoost
-dataset_name: SeverityFeatures
+dataset_name: severity_features
 mode: train
 
 is_tuned: untuned

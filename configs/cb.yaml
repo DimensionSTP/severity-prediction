@@ -20,7 +20,7 @@ objective_name: RMSE
 metric_name: RMSE
 
 model_name: CatBoost
-dataset_name: SeverityFeatures
+dataset_name: severity_features
 mode: train
 
 is_tuned: untuned
