@@ -1,0 +1,8 @@
+_target_: src.architectures.xgb_architecture.XGBArchitecture
+objective_name: ${objective_name}
+metric_name: ${metric_name}
+project_name: ${project_name}
+user_name: ${user_name}
+save_detail: ${save_detail}
+model_save_path: ${model_save_path}
+result_summary_path: ${result_summary_path}
