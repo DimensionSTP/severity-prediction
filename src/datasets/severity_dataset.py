@@ -11,6 +11,7 @@ class SeverityDataset:
         mode: str,
         data_path: str,
         dataset_name: str,
+        unused_features: List[str],
         label_column_name: str,
         scale_type: str,
     ) -> None:
@@ -22,6 +23,7 @@ class SeverityDataset:
 
         self.data_path = data_path
         self.dataset_name = dataset_name
+        self.unused_features = unused_features
         self.label_column_name = label_column_name
         self.scale_type = scale_type
         if self.scale_type not in ["unscale", "standard", "min-max"]:
@@ -29,8 +31,9 @@ class SeverityDataset:
                 f"Invalid scale execution type: {self.scale_type}. Choose in ['unscale', 'standard', 'min-max']."
             )
 
-    def __call__(self) -> Tuple[pd.DataFrame, pd.Series]:
+    def __call__(self) -> Dict[str, Any]:
         dataset = self.load_dataset()
+        dataset = self.select_features(dataset)
         dataset = self.preprocess_certain_features(dataset)
         dataset = self.interpolate_dataset(dataset)
         dataset = self.get_preprocessed_dataset(dataset)
@@ -50,6 +53,16 @@ class SeverityDataset:
             dataset = pd.read_csv(f"{self.data_path}/{self.dataset_name}_test.csv")
         else:
             dataset = pd.read_csv(f"{self.data_path}/{self.dataset_name}_train.csv")
+        return dataset
+
+    def select_features(
+        self,
+        dataset: pd.DataFrame,
+    ) -> pd.DataFrame:
+        unused_features = [
+            feature for feature in self.unused_features if feature in dataset.columns
+        ]
+        dataset.drop(columns=unused_features)
         return dataset
 
     def preprocess_certain_features(
