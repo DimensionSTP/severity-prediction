@@ -8,8 +8,6 @@ import os
 import warnings
 
 os.environ["HYDRA_FULL_ERROR"] = "1"
-os.environ["HF_HOME"] = os.environ.get("HF_HOME")
-os.environ["TOKENIZERS_PARALLELISM"] = "false"
 warnings.filterwarnings("ignore")
 
 import json
@@ -22,7 +20,7 @@ from src.pipelines.pipeline import train, test, predict, tune
 
 @hydra.main(
     config_path="configs/",
-    config_name="huggingface.yaml",
+    config_name="lgbm.yaml",
 )
 def main(
     config: DictConfig,
