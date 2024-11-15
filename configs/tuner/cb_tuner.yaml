@@ -1,0 +1,69 @@
+_target_: src.tuners.cb_tuner.CBTuner
+hparams:
+  iterations:
+    low: 8
+    high: 1024
+    step: 1
+    log: False
+  learning_rate:
+    low: 1e-4
+    high: 1.0
+    log: True
+  depth:
+    low: 1
+    high: 10
+    log: True
+  l2_leaf_reg:
+    low: 1
+    high: 10
+    log: False
+  model_size_reg:
+    low: 1e-1
+    high: 1e+1
+    log: False
+  rsm:
+    low: 1e-1
+    high: 1.0
+    log: False
+  subsample:
+    low: 1e-1
+    high: 1.0
+    log: False
+  border_count:
+    low: 32
+    high: 255
+    log: False
+  feature_border_type:
+    - Median
+    - Uniform
+    - UniformAndQuantiles
+    - MaxLogSum
+    - MinEntropy
+    - GreedyLogSum
+  bootstrap_type:
+    - Bayesian
+    - Bernoulli
+    - MVS
+  grow_policy:
+    - SymmetricTree
+    - Lossguide
+    - Depthwise
+  leaf_estimation_method:
+    - Newton
+    - Gradient
+  random_strength:
+    low: 1
+    high: 1e+2
+    log: False
+  bagging_temperature:
+    low: 1e-1
+    high: 1.0
+    log: False
+
+direction: ${direction}
+seed: ${seed}
+num_trials: ${num_trials}
+objective_name: ${objective_name}
+metric_name: ${metric_name}
+num_folds: ${num_folds}
+hparams_save_path: ${hparams_save_path}
