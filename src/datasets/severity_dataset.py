@@ -38,6 +38,7 @@ class SeverityDataset:
 
     def __call__(self) -> Dict[str, Any]:
         dataset = self.load_dataset()
+        dataset = self.map_columns(dataset)
         dataset = self.select_features(dataset)
         dataset = self.preprocess_certain_features(dataset)
         dataset = self.interpolate_dataset(dataset)
@@ -60,7 +61,7 @@ class SeverityDataset:
             dataset = pd.read_csv(f"{self.data_path}/{self.dataset_name}_train.csv")
         return dataset
 
-    def select_features(
+    def map_columns(
         self,
         dataset: pd.DataFrame,
     ) -> pd.DataFrame:
