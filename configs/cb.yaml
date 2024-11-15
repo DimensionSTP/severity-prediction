@@ -11,6 +11,7 @@ connected_dir: ${oc.env:CONNECTED_DIR}/${package_name}
 
 seed: 2024
 
+split_ratio: 1e-1
 columns_mapping_file_name: columns_mapping
 label_column_name: transfer_status
 scale_type: unscale
