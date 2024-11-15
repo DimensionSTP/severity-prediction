@@ -2,5 +2,7 @@ _target_: src.datasets.severity_dataset.SeverityDataset
 mode: ${mode}
 data_path: ${connected_dir}/data
 dataset_name: ${dataset_name}
+columns_mapping_file_name: ${columns_mapping_file_name}
+using_features: ${using_features}
 label_column_name: ${label_column_name}
 scale_type: ${scale_type}
