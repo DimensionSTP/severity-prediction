@@ -64,10 +64,23 @@ class SeverityDataset:
         self,
         dataset: pd.DataFrame,
     ) -> pd.DataFrame:
-        unused_features = [
-            feature for feature in self.unused_features if feature in dataset.columns
+        columns_mapping_file_path = os.path.join(
+            self.data_path,
+            self.columns_mapping_file_name,
+        )
+        with open(columns_mapping_file_path, "r", encoding="utf-8") as f:
+            loaded_mapping = json.load(f)
+        dataset = dataset.rename(columns=loaded_mapping)
+        return dataset
+
+    def select_features(
+        self,
+        dataset: pd.DataFrame,
+    ) -> pd.DataFrame:
+        using_features = [
+            feature for feature in self.using_features if feature in dataset.columns
         ]
-        dataset.drop(columns=unused_features)
+        dataset[using_features]
         return dataset
 
     def preprocess_certain_features(
