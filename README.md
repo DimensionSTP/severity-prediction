@@ -1,16 +1,16 @@
-# Basic DL pipeline for CV classification
+# Basic ML pipeline for Tabular dataset classification
 
-## For burn skin image classification
+## For post-infectious disease severity tabular dataset classification
 
 ### Dataset
-Burn skin image datasets
+Post-infectious disease severity tabular dataset
 
 ### Quick setup
 
 ```bash
 # clone project
-git clone https://github.com/DimensionSTP/burn-vs-all.git
-cd burn-vs-all
+git clone https://github.com/DimensionSTP/severity-prediction.git
+cd severity-prediction
 
 # [OPTIONAL] create conda environment
 conda create -n myenv python=3.10 -y
@@ -24,8 +24,6 @@ pip install -r requirements.txt
 ```shell
 PROJECT_DIR={PROJECT_DIR}
 CONNECTED_DIR={CONNECTED_DIR}
-DEVICES={DEVICES}
-HF_HOME={HF_HOME}
 USER_NAME={USER_NAME}
 ```
 
