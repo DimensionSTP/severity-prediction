@@ -55,11 +55,7 @@ def predict(
     dataset = dataset()
     data = dataset["data"]
 
-    architecture.predict(
-        data=data,
-        submission_save_path=config.submission_save_path,
-        submission_save_name=config.submission_save_name,
-    )
+    architecture.predict(data=data)
 
 
 def tune(
