@@ -12,7 +12,16 @@ connected_dir: ${oc.env:CONNECTED_DIR}/${package_name}
 seed: 2024
 
 split_ratio: 1e-1
-columns_mapping_file_name: columns_mapping
+columns_mapping_file_path: metadata/columns_mapping.json
+is_all_features: False
+unusing_features:
+  - patient_id
+  - symptom_onset_date
+  - diagnosis_date
+  - admission_date
+  - discharge_date
+  - transfer_date
+label_encoder_path: label_encoders
 label_column_name: transfer_status
 scale_type: unscale
 num_folds: 5
