@@ -16,7 +16,7 @@ from omegaconf import DictConfig
 
 @hydra.main(
     config_path="../../configs/",
-    config_name="physca.yaml",
+    config_name="lgbm.yaml",
 )
 def split_data(
     config: DictConfig,
