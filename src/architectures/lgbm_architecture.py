@@ -64,36 +64,36 @@ class LGBMArchitecture:
         data: pd.DataFrame,
         label: pd.Series,
     ) -> None:
-        kf = StratifiedKFold(
-            n_splits=num_folds,
-            shuffle=True,
-            random_state=seed,
-        )
-        if is_tuned == "tuned":
-            params = json.load(
-                open(
-                    f"{hparams_save_path}/best_params.json",
-                    "rt",
-                    encoding="UTF-8",
-                )
-            )
-            params["verbose"] = -1
-        elif is_tuned == "untuned":
-            params = {
-                "boosting_type": "gbdt",
-                "objective": self.objective_name,
-                "metric": self.metric_name,
-                "seed": seed,
-                "verbosity": -1,
-            }
-        else:
-            raise ValueError(f"Invalid is_tuned argument: {is_tuned}")
-
         wandb.init(
             project=self.project_name,
             entity=self.user_name,
             name=self.save_detail,
         )
+
+        kf = StratifiedKFold(
+            n_splits=self.num_folds,
+            shuffle=True,
+            random_state=self.seed,
+        )
+        if self.is_tuned == "tuned":
+            params = json.load(
+                open(
+                    f"{self.hparams_save_path}/best_params.json",
+                    "rt",
+                    encoding="UTF-8",
+                )
+            )
+            params["verbosity"] = -1
+        elif self.is_tuned == "untuned":
+            params = {
+                "boosting_type": "gbdt",
+                "objective": self.objective_name,
+                "metric": self.metric_name,
+                "seed": self.seed,
+                "verbosity": -1,
+            }
+        else:
+            raise ValueError(f"Invalid is_tuned argument: {self.is_tuned}")
 
         metric_results = []
         for i, idx in enumerate(tqdm(kf.split(data, label))):
@@ -143,7 +143,7 @@ class LGBMArchitecture:
         result = {
             "model_type": "LightGBM",
             "used_features": data.columns.tolist(),
-            "num_folds": num_folds,
+            "num_folds": self.num_folds,
             self.metric_name: avg_metric_result,
         }
         result_df = pd.DataFrame.from_dict(
@@ -194,12 +194,12 @@ class LGBMArchitecture:
         )
 
         os.makedirs(
-            plt_save_path,
+            self.plt_save_path,
             exist_ok=True,
         )
 
         plt.savefig(
-            f"{plt_save_path}/num_folds={num_folds}-metric_result={avg_metric_result}.png"
+            f"{self.plt_save_path}/num_folds={self.num_folds}-metric_result={avg_metric_result}.png"
         )
 
     def test(
