@@ -14,8 +14,10 @@ class SeverityDataset:
         mode: str,
         data_path: str,
         dataset_name: str,
-        columns_mapping_file_name: str,
-        using_features: List[str],
+        columns_mapping_file_path: str,
+        is_all_features: bool,
+        unusing_features: List[str],
+        label_encoder_path: str,
         label_column_name: str,
         scale_type: str,
     ) -> None:
@@ -27,8 +29,10 @@ class SeverityDataset:
 
         self.data_path = data_path
         self.dataset_name = dataset_name
-        self.columns_mapping_file_name = columns_mapping_file_name
-        self.using_features = using_features
+        self.columns_mapping_file_path = columns_mapping_file_path
+        self.is_all_features = is_all_features
+        self.unusing_features = unusing_features
+        self.label_encoder_path = label_encoder_path
         self.label_column_name = label_column_name
         self.scale_type = scale_type
         if self.scale_type not in ["unscale", "standard", "min-max"]:
