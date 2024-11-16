@@ -32,5 +32,6 @@ seed: ${seed}
 num_trials: ${num_trials}
 objective_name: ${objective_name}
 metric_name: ${metric_name}
+early_stop: ${early_stop}
 num_folds: ${num_folds}
 hparams_save_path: ${hparams_save_path}
