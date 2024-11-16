@@ -31,7 +31,7 @@ USER_NAME={USER_NAME}
 
 * end-to-end
 ```shell
-python main.py mode=tune is_tuned=untuned num_trials={num_trials}
+python main.py mode=tune num_trials={num_trials}
 ```
 
 ### Training
