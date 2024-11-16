@@ -83,6 +83,9 @@ class LGBMArchitecture:
                     encoding="UTF-8",
                 )
             )
+            params["objective"] = self.objective_name
+            params["metric"] = self.metric_name
+            params["seed"] = self.seed
             params["verbosity"] = -1
         elif self.is_tuned == "untuned":
             params = {

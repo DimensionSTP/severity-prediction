@@ -82,6 +82,9 @@ class XGBArchitecture:
                     encoding="UTF-8",
                 )
             )
+            params["objective"] = self.objective_name
+            params["eval_metric"] = self.metric_name
+            params["random_state"] = self.seed
             params["verbose"] = -1
         elif self.is_tuned == "untuned":
             params = {

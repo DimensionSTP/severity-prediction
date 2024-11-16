@@ -81,6 +81,9 @@ class CBArchitecture:
                     encoding="UTF-8",
                 )
             )
+            params["loss_function"] = self.objective_name
+            params["eval_metric"] = self.metric_name
+            params["random_seed"] = self.seed
             params["verbose"] = -1
         elif self.is_tuned == "untuned":
             params = {
