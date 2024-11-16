@@ -228,7 +228,7 @@ class CBTuner:
                 early_stopping_rounds=self.early_stop,
             )
 
-            metric_result = model.best_score_["validation"][self.metric_name]
+            metric_result = model.best_score_["validation_1"][self.metric_name]
             metric_results.append(metric_result)
         score = np.mean(metric_results)
         return score
