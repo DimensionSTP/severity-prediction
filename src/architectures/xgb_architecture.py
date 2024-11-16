@@ -89,6 +89,7 @@ class XGBArchitecture:
                 "objective": self.objective_name,
                 "eval_metric": self.metric_name,
                 "random_state": self.seed,
+                "verbose": -1,
             }
         else:
             raise ValueError(f"Invalid is_tuned argument: {self.is_tuned}")

@@ -87,6 +87,7 @@ class CBArchitecture:
                 "loss_function": self.objective_name,
                 "eval_metric": self.metric_name,
                 "random_seed": self.seed,
+                "verbose": -1,
             }
         else:
             raise ValueError(f"Invalid is_tuned argument: {self.is_tuned}")
