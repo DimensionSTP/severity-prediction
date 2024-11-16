@@ -62,11 +62,6 @@ class XGBArchitecture:
         self,
         data: pd.DataFrame,
         label: pd.Series,
-        num_folds: int,
-        seed: int,
-        is_tuned: bool,
-        hparams_save_path: str,
-        plt_save_path: str,
     ) -> None:
         kf = StratifiedKFold(
             n_splits=num_folds,

@@ -61,11 +61,6 @@ class CBArchitecture:
         self,
         data: pd.DataFrame,
         label: pd.Series,
-        num_folds: int,
-        seed: int,
-        is_tuned: str,
-        hparams_save_path: str,
-        plt_save_path: str,
     ) -> None:
         cat_features = [
             column for column in data.columns if data[column].dtype == "object"
