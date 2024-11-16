@@ -204,19 +204,36 @@ class CBArchitecture:
         data: pd.DataFrame,
         label: pd.Series,
     ) -> None:
+        wandb.init(
+            project=self.project_name,
+            entity=self.user_name,
+            name=self.save_detail,
+        )
+
+        test_dataset = cb.Pool(
+            data=data,
+            label=label,
+        )
+
+        model = cb.CatBoostClassifier()
+
         model_files = os.listdir(self.model_save_path)
         metric_results = []
         for model_file in tqdm(model_files):
-            model = cb.CatBoostRegressor()
             model.load_model(f"{self.model_save_path}/{model_file}")
-            pred = model.predict(data) / len((model_files))
-            metric_result = np.sqrt(
-                mean_squared_error(
-                    label,
-                    pred,
-                )
-            )
+            metric_result = model.eval_metrics(
+                data=test_dataset,
+                metrics=[self.metric_name],
+            )[self.metric_name][-1]
             metric_results.append(metric_result)
+
+            wandb.log(
+                {
+                    "model_file": model_file.split(".")[0],
+                    self.metric_name: metric_result,
+                }
+            )
+
         avg_metric_result = np.mean(metric_results)
         print(f"average {self.metric_name}: {avg_metric_result}")
 
@@ -265,28 +282,29 @@ class CBArchitecture:
     def predict(
         self,
         data: pd.DataFrame,
-        submission_save_path: str,
-        submission_save_name: str,
     ) -> None:
+        predict_dataset = cb.Pool(data=data)
+
+        model = cb.CatBoostClassifier()
+
         model_files = os.listdir(self.model_save_path)
         pred_mean = np.zeros((len(data),))
         for model_file in tqdm(model_files):
-            model = cb.CatBoostRegressor()
             model.load_model(f"{self.model_save_path}/{model_file}")
-            pred = model.predict(data) / len((model_files))
+            pred = model.predict(data=predict_dataset) / len((model_files))
             pred_mean += pred
 
         submission = pd.DataFrame(
-            pred_mean.astype(int),
-            columns=["target"],
+            np.round(pred_mean).astype(int),
+            columns=[self.label_column_name],
         )
 
         os.makedirs(
-            submission_save_path,
+            self.submission_save_path,
             exist_ok=True,
         )
 
         submission.to_csv(
-            f"{submission_save_path}/{submission_save_name}.csv",
+            f"{self.submission_save_path}/{self.save_detail}.csv",
             index=False,
         )

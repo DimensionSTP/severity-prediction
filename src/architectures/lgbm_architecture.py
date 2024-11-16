@@ -207,18 +207,30 @@ class LGBMArchitecture:
         data: pd.DataFrame,
         label: pd.Series,
     ) -> None:
+        wandb.init(
+            project=self.project_name,
+            entity=self.user_name,
+            name=self.save_detail,
+        )
+
         model_files = os.listdir(self.model_save_path)
         metric_results = []
         for model_file in tqdm(model_files):
             model = lgb.Booster(model_file=f"{self.model_save_path}/{model_file}")
-            pred = model.predict(data) / len((model_files))
-            metric_result = np.sqrt(
-                mean_squared_error(
-                    label,
-                    pred,
-                )
+            pred = model.predict(data=data)
+            metric_result = roc_auc_score(
+                y_true=label,
+                y_score=pred,
             )
             metric_results.append(metric_result)
+
+            wandb.log(
+                {
+                    "model_file": model_file.split(".")[0],
+                    self.metric_name: metric_result,
+                }
+            )
+
         avg_metric_result = np.mean(metric_results)
         print(f"average {self.metric_name}: {avg_metric_result}")
 
@@ -267,26 +279,25 @@ class LGBMArchitecture:
     def predict(
         self,
         data: pd.DataFrame,
-        submission_save_path: str,
-        submission_save_name: str,
     ) -> None:
         model_files = os.listdir(self.model_save_path)
         pred_mean = np.zeros((len(data),))
         for model_file in tqdm(model_files):
             model = lgb.Booster(model_file=f"{self.model_save_path}/{model_file}")
-            pred = model.predict(data) / len((model_files))
+            pred = model.predict(data=data) / len((model_files))
             pred_mean += pred
+
         submission = pd.DataFrame(
-            pred_mean.astype(int),
-            columns=["target"],
+            np.round(pred_mean).astype(int),
+            columns=[self.label_column_name],
         )
 
         os.makedirs(
-            submission_save_path,
+            self.submission_save_path,
             exist_ok=True,
         )
 
         submission.to_csv(
-            f"{submission_save_path}/{submission_save_name}.csv",
+            f"{self.submission_save_path}/{self.save_detail}.csv",
             index=False,
         )
