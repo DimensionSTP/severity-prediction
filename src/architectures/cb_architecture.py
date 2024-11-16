@@ -84,13 +84,13 @@ class CBArchitecture:
             params["loss_function"] = self.objective_name
             params["eval_metric"] = self.metric_name
             params["random_seed"] = self.seed
-            params["verbose"] = -1
+            params["verbose"] = False
         elif self.is_tuned == "untuned":
             params = {
                 "loss_function": self.objective_name,
                 "eval_metric": self.metric_name,
                 "random_seed": self.seed,
-                "verbose": -1,
+                "verbose": False,
             }
         else:
             raise ValueError(f"Invalid is_tuned argument: {self.is_tuned}")
@@ -124,7 +124,6 @@ class CBArchitecture:
                 ],
                 use_best_model=True,
                 plot=False,
-                early_stopping_rounds=self.early_stop,
                 callbacks=[WandbCallback()],
             )
 
