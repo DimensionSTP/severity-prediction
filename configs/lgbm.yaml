@@ -26,8 +26,9 @@ label_column_name: transfer_status
 scale_type: unscale
 num_folds: 5
 
-objective_name: regression
-metric_name: rmse
+objective_name: binary
+metric_name: auc
+early_stop: 10
 
 model_name: LightGBM
 dataset_name: severity_features
