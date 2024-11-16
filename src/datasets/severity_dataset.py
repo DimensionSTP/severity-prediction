@@ -91,10 +91,13 @@ class SeverityDataset:
         self,
         dataset: pd.DataFrame,
     ) -> pd.DataFrame:
-        using_features = [
-            feature for feature in self.using_features if feature in dataset.columns
+        if self.is_all_features:
+            return dataset
+
+        unusing_features = [
+            feature for feature in self.unusing_features if feature in dataset.columns
         ]
-        dataset[using_features]
+        dataset = dataset.drop(columns=unusing_features)
         return dataset
 
     def preprocess_certain_features(
