@@ -200,8 +200,16 @@ class SeverityDataset:
             )
             label = dataset[self.label_column_name]
         else:
-            data = dataset
-            label = 0
+            try:
+                data = dataset.drop(
+                    [self.label_column_name],
+                    axis=1,
+                )
+                label = dataset[self.label_column_name]
+            except:
+                data = dataset
+                dataset[self.label_column_name] = 0
+                label = dataset[self.label_column_name]
 
         if self.scale_type == "standard":
             scaler = StandardScaler()
