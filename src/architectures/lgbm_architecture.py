@@ -100,23 +100,26 @@ class LGBMArchitecture:
             train_data, train_label = data.loc[idx[0]], label.loc[idx[0]]
             val_data, val_label = data.loc[idx[1]], label.loc[idx[1]]
             train_dataset = lgb.Dataset(
-                train_data,
-                train_label,
+                data=train_data,
+                label=train_label,
             )
             val_dataset = lgb.Dataset(
-                val_data,
-                val_label,
+                data=val_data,
+                label=val_label,
             )
 
             model = lgb.train(
-                params,
-                train_dataset,
+                params=params,
+                train_set=train_dataset,
                 valid_sets=[
                     train_dataset,
                     val_dataset,
                 ],
                 valid_names=("validation"),
-                callbacks=[wandb_callback()],
+                callbacks=[
+                    lgb.early_stopping(stopping_rounds=self.early_stop),
+                    wandb_callback(),
+                ],
             )
             log_summary(
                 model,
@@ -127,15 +130,12 @@ class LGBMArchitecture:
                 self.model_save_path,
                 exist_ok=True,
             )
-            model.save_model(f"{self.model_save_path}/fold{i}.txt")
-
-            pred = model.predict(val_data)
-            metric_result = np.sqrt(
-                mean_squared_error(
-                    val_label,
-                    pred,
-                )
+            model.save_model(
+                filename=f"{self.model_save_path}/fold{i}.txt",
+                num_iteration=model.best_iteration,
             )
+
+            metric_result = model.best_score["validation"][params["metric"]]
             metric_results.append(metric_result)
         avg_metric_result = np.mean(metric_results)
         print(f"average {self.metric_name}: {avg_metric_result}")

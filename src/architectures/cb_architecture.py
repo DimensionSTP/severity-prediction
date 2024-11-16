@@ -101,11 +101,26 @@ class CBArchitecture:
         for i, idx in enumerate(tqdm(kf.split(data, label))):
             train_data, train_label = data.loc[idx[0]], label.loc[idx[0]]
             val_data, val_label = data.loc[idx[1]], label.loc[idx[1]]
+            train_dataset = cb.Pool(
+                data=train_data,
+                label=train_label,
+                cat_features=cat_features,
+            )
+            val_dataset = cb.Pool(
+                data=val_data,
+                label=val_label,
+                cat_features=cat_features,
+            )
 
             model.fit(
-                train_data,
-                train_label,
-                cat_features=cat_features,
+                X=train_dataset,
+                eval_set=[
+                    train_dataset,
+                    val_dataset,
+                ],
+                use_best_model=True,
+                plot=False,
+                early_stopping_rounds=self.early_stop,
                 callbacks=[WandbCallback()],
             )
 
@@ -115,13 +130,7 @@ class CBArchitecture:
             )
             model.save_model(fname=f"{self.model_save_path}/fold{i}.txt")
 
-            pred = model.predict(val_data)
-            metric_result = np.sqrt(
-                mean_squared_error(
-                    val_label,
-                    pred,
-                )
-            )
+            metric_result = model.best_score_["validation_1"][self.metric_name]
             metric_results.append(metric_result)
         avg_metric_result = np.mean(metric_results)
         print(f"average {self.metric_name}: {avg_metric_result}")

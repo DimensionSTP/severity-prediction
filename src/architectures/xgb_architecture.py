@@ -97,10 +97,31 @@ class XGBArchitecture:
         for i, idx in enumerate(tqdm(kf.split(data, label))):
             train_data, train_label = data.loc[idx[0]], label.loc[idx[0]]
             val_data, val_label = data.loc[idx[1]], label.loc[idx[1]]
+            train_dataset = xgb.DMatrix(
+                data=train_data,
+                label=train_label,
+                enable_categorical=True,
+            )
+            val_dataset = xgb.DMatrix(
+                data=val_data,
+                label=val_label,
+                enable_categorical=True,
+            )
 
-            model.fit(
-                train_data,
-                train_label,
+            model = xgb.train(
+                params=params,
+                dtrain=train_dataset,
+                evals=[
+                    (
+                        train_dataset,
+                        "train",
+                    ),
+                    (
+                        val_dataset,
+                        "validation",
+                    ),
+                ],
+                early_stopping_rounds=self.early_stop,
                 callbacks=[WandbCallback(log_model=True)],
             )
 
@@ -108,15 +129,9 @@ class XGBArchitecture:
                 self.model_save_path,
                 exist_ok=True,
             )
-            model.save_model(f"{self.model_save_path}/fold{i}.model")
+            model.save_model(fname=f"{self.model_save_path}/fold{i}.txt")
 
-            pred = model.predict(val_data)
-            metric_result = np.sqrt(
-                mean_squared_error(
-                    val_label,
-                    pred,
-                )
-            )
+            metric_result = model.best_score
             metric_results.append(metric_result)
         avg_metric_result = np.mean(metric_results)
         print(f"average {self.metric_name}: {avg_metric_result}")
