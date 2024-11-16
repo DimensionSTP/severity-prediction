@@ -88,7 +88,6 @@ class CBTuner:
         trial: optuna.trial.Trial,
     ) -> float:
         params = dict()
-        params["booster"] = "Plain"
         params["loss_function"] = self.objective_name
         params["eval_metric"] = self.metric_name
         params["random_seed"] = self.seed
