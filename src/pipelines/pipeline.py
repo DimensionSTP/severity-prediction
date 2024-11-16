@@ -24,11 +24,6 @@ def train(
     architecture.train(
         data=data,
         label=label,
-        num_folds=config.num_folds,
-        seed=config.seed,
-        is_tuned=config.is_tuned,
-        hparams_save_path=config.hparams_save_path,
-        plt_save_path=config.plt_save_path,
     )
 
 
