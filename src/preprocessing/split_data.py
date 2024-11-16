@@ -36,8 +36,14 @@ def split_data(
     train_dataset = train_dataset.reset_index(drop=True)
     test_dataset = test_dataset.reset_index(drop=True)
 
-    train_dataset.to_csv(f"{config.connected_dir}/data/{config.dataset_name}_train.csv")
-    test_dataset.to_csv(f"{config.connected_dir}/data/{config.dataset_name}_test.csv")
+    train_dataset.to_csv(
+        f"{config.connected_dir}/data/{config.dataset_name}_train.csv",
+        index=False,
+    )
+    test_dataset.to_csv(
+        f"{config.connected_dir}/data/{config.dataset_name}_test.csv",
+        index=False,
+    )
 
 
 def map_columns(
