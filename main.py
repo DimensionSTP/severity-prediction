@@ -13,7 +13,7 @@ warnings.filterwarnings("ignore")
 import json
 
 import hydra
-from omegaconf import OmegaConf, DictConfig
+from omegaconf import DictConfig
 
 from src.pipelines.pipeline import train, test, predict, tune
 
