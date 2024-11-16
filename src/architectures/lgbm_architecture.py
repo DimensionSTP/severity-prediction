@@ -23,23 +23,41 @@ import matplotlib.pyplot as plt
 class LGBMArchitecture:
     def __init__(
         self,
-        objective_name: str,
-        metric_name: str,
         project_name: str,
         user_name: str,
         save_detail: str,
+        num_folds: int,
+        seed: int,
+        is_tuned: bool,
+        hparams_save_path: str,
+        objective_name: str,
+        metric_name: str,
+        early_stop: int,
         model_save_path: str,
         result_summary_path: str,
+        plt_save_path: str,
+        label_column_name: str,
+        submission_save_path: str,
     ) -> None:
-        self.objective_name = objective_name
-        self.metric_name = metric_name
-
         self.project_name = project_name
         self.user_name = user_name
         self.save_detail = save_detail
 
+        self.num_folds = num_folds
+        self.seed = seed
+        self.is_tuned = is_tuned
+        self.hparams_save_path = hparams_save_path
+
+        self.objective_name = objective_name
+        self.metric_name = metric_name
+        self.early_stop = early_stop
+
         self.model_save_path = model_save_path
         self.result_summary_path = result_summary_path
+        self.plt_save_path = plt_save_path
+
+        self.label_column_name = label_column_name
+        self.submission_save_path = submission_save_path
 
     def train(
         self,
