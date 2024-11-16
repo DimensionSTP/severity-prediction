@@ -51,8 +51,8 @@ def map_columns(
     dataset: pd.DataFrame,
 ) -> pd.DataFrame:
     columns_mapping_file_path = os.path.join(
-        config.data_path,
-        config.columns_mapping_file_name,
+        config.connected_dir,
+        config.columns_mapping_file_path,
     )
 
     try:
