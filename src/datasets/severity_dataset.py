@@ -69,16 +69,13 @@ class SeverityDataset:
         self,
         dataset: pd.DataFrame,
     ) -> pd.DataFrame:
-        columns_mapping_file_path = os.path.join(
-            self.data_path,
-            self.columns_mapping_file_name,
-        )
-
         try:
-            with open(columns_mapping_file_path, "r", encoding="utf-8") as f:
+            with open(self.columns_mapping_file_path, "r", encoding="utf-8") as f:
                 mapping_info = json.load(f)
         except FileNotFoundError:
-            raise ValueError(f"Mapping file not found: {columns_mapping_file_path}")
+            raise ValueError(
+                f"Mapping file not found: {self.columns_mapping_file_path}"
+            )
 
         columns_mapping = {
             column: mapping_info.get(
