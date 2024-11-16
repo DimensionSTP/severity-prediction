@@ -10,7 +10,6 @@ import pandas as pd
 from tqdm import tqdm
 
 from sklearn.model_selection import StratifiedKFold
-from sklearn.metrics import mean_squared_error
 
 import lightgbm as lgb
 
@@ -30,17 +29,22 @@ class LGBMTuner:
         num_trials: int,
         objective_name: str,
         metric_name: str,
+        early_stop: int,
         num_folds: int,
         hparams_save_path: str,
     ) -> None:
         self.hparams = hparams
+
         self.data = data
         self.label = label
+
         self.direction = direction
         self.seed = seed
         self.num_trials = num_trials
+
         self.objective_name = objective_name
         self.metric_name = metric_name
+        self.early_stop = early_stop
         self.num_folds = num_folds
         self.hparams_save_path = hparams_save_path
 
@@ -183,31 +187,26 @@ class LGBMTuner:
             train_data, train_label = self.data.loc[idx[0]], self.label.loc[idx[0]]
             val_data, val_label = self.data.loc[idx[1]], self.label.loc[idx[1]]
             train_dataset = lgb.Dataset(
-                train_data,
-                train_label,
+                data=train_data,
+                label=train_label,
             )
             val_dataset = lgb.Dataset(
-                val_data,
-                val_label,
+                data=val_data,
+                label=val_label,
             )
 
             model = lgb.train(
-                params,
-                train_dataset,
+                params=params,
+                train_set=train_dataset,
                 valid_sets=[
                     train_dataset,
                     val_dataset,
                 ],
                 valid_names=("validation"),
+                callbacks=[lgb.early_stopping(stopping_rounds=self.early_stop)],
             )
 
-            pred = model.predict(val_data)
-            metric_result = np.sqrt(
-                mean_squared_error(
-                    val_label,
-                    pred,
-                )
-            )
+            metric_result = model.best_score["validation"][params["metric"]]
             metric_results.append(metric_result)
         score = np.mean(metric_results)
         return score

@@ -10,7 +10,6 @@ import pandas as pd
 from tqdm import tqdm
 
 from sklearn.model_selection import StratifiedKFold
-from sklearn.metrics import mean_squared_error
 
 import catboost as cb
 
@@ -30,17 +29,22 @@ class CBTuner:
         num_trials: int,
         objective_name: str,
         metric_name: str,
+        early_stop: int,
         num_folds: int,
         hparams_save_path: str,
     ) -> None:
         self.hparams = hparams
+
         self.data = data
         self.label = label
+
         self.direction = direction
         self.seed = seed
         self.num_trials = num_trials
+
         self.objective_name = objective_name
         self.metric_name = metric_name
+        self.early_stop = early_stop
         self.num_folds = num_folds
         self.hparams_save_path = hparams_save_path
 
@@ -85,8 +89,8 @@ class CBTuner:
     ) -> float:
         params = dict()
         params["booster"] = "Plain"
-        params["objective"] = self.objective_name
-        params["metric"] = self.metric_name
+        params["loss_function"] = self.objective_name
+        params["eval_metric"] = self.metric_name
         params["random_seed"] = self.seed
         if self.hparams.iterations:
             params["iterations"] = trial.suggest_int(
@@ -185,38 +189,47 @@ class CBTuner:
         else:
             del params["bagging_temperature"]
 
-        cat_features = [
-            column
-            for column in self.data.columns
-            if self.data[column].dtype == "object"
-        ]
-
         kf = StratifiedKFold(
             n_splits=self.num_folds,
             shuffle=True,
             random_state=self.seed,
         )
 
-        model = cb.CatBoostRegressor(**params)
+        model = cb.CatBoostClassifier(**params)
+
+        cat_features = [
+            column
+            for column in self.data.columns
+            if self.data[column].dtype == "object"
+        ]
 
         metric_results = []
         for idx in tqdm(kf.split(self.data, self.label)):
             train_data, train_label = self.data.loc[idx[0]], self.label.loc[idx[0]]
             val_data, val_label = self.data.loc[idx[1]], self.label.loc[idx[1]]
-
-            model.fit(
-                train_data,
-                train_label,
+            train_dataset = cb.Pool(
+                data=train_data,
+                label=train_label,
+                cat_features=cat_features,
+            )
+            val_dataset = cb.Pool(
+                data=val_data,
+                label=val_label,
                 cat_features=cat_features,
             )
 
-            pred = model.predict(val_data)
-            metric_result = np.sqrt(
-                mean_squared_error(
-                    val_label,
-                    pred,
-                )
+            model.fit(
+                X=train_dataset,
+                eval_set=[
+                    train_dataset,
+                    val_dataset,
+                ],
+                use_best_model=True,
+                plot=False,
+                early_stopping_rounds=self.early_stop,
             )
+
+            metric_result = model.best_score_["validation"][self.metric_name]
             metric_results.append(metric_result)
         score = np.mean(metric_results)
         return score

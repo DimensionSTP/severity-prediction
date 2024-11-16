@@ -10,7 +10,6 @@ import pandas as pd
 from tqdm import tqdm
 
 from sklearn.model_selection import StratifiedKFold
-from sklearn.metrics import mean_squared_error
 
 import xgboost as xgb
 
@@ -30,17 +29,22 @@ class XGBTuner:
         num_trials: int,
         objective_name: str,
         metric_name: str,
+        early_stop: int,
         num_folds: int,
         hparams_save_path: str,
     ) -> None:
         self.hparams = hparams
+
         self.data = data
         self.label = label
+
         self.direction = direction
         self.seed = seed
         self.num_trials = num_trials
+
         self.objective_name = objective_name
         self.metric_name = metric_name
+        self.early_stop = early_stop
         self.num_folds = num_folds
         self.hparams_save_path = hparams_save_path
 
@@ -134,25 +138,38 @@ class XGBTuner:
             random_state=self.seed,
         )
 
-        model = xgb.XGBRegressor(**params)
-
         metric_results = []
         for idx in tqdm(kf.split(self.data, self.label)):
             train_data, train_label = self.data.loc[idx[0]], self.label.loc[idx[0]]
             val_data, val_label = self.data.loc[idx[1]], self.label.loc[idx[1]]
-
-            model.fit(
-                train_data,
-                train_label,
+            train_dataset = xgb.DMatrix(
+                data=train_data,
+                label=train_label,
+                enable_categorical=True,
+            )
+            val_dataset = xgb.DMatrix(
+                data=val_data,
+                label=val_label,
+                enable_categorical=True,
             )
 
-            pred = model.predict(val_data)
-            metric_result = np.sqrt(
-                mean_squared_error(
-                    val_label,
-                    pred,
-                )
+            model = xgb.train(
+                params=params,
+                dtrain=train_dataset,
+                evals=[
+                    (
+                        train_dataset,
+                        "train",
+                    ),
+                    (
+                        val_dataset,
+                        "validation",
+                    ),
+                ],
+                early_stopping_rounds=self.early_stop,
             )
+
+            metric_result = model.best_score
             metric_results.append(metric_result)
         score = np.mean(metric_results)
         return score
