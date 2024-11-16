@@ -1,6 +1,7 @@
 from typing import Dict, Any, List
 import os
 import json
+import joblib
 
 import pandas as pd
 
@@ -183,10 +184,28 @@ class SeverityDataset:
         self,
         dataset: pd.DataFrame,
     ) -> pd.DataFrame:
+        os.makedirs(
+            self.label_encoder_path,
+            exist_ok=True,
+        )
+
         _, categorical_columns = self.get_columns_by_types(dataset)
         for column in categorical_columns:
-            label_encoder = LabelEncoder()
-            dataset[column] = label_encoder.fit_transform(dataset[column].astype(str))
+            label_encoder_file_path = f"{self.label_encoder_path}/{column}_encoder.pkl"
+            try:
+                label_encoder = joblib.load(label_encoder_file_path)
+                dataset[column] = label_encoder.fit_transform(
+                    dataset[column].astype(str)
+                )
+            except:
+                label_encoder = LabelEncoder()
+                dataset[column] = label_encoder.fit_transform(
+                    dataset[column].astype(str)
+                )
+                joblib.dump(
+                    label_encoder,
+                    label_encoder_file_path,
+                )
         return dataset
 
     def get_preprocessed_dataset(
