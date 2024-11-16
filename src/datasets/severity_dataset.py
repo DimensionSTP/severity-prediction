@@ -45,6 +45,7 @@ class SeverityDataset:
         dataset = self.map_columns(dataset)
         dataset = self.select_features(dataset)
         dataset = self.preprocess_certain_features(dataset)
+        dataset = self.process_date_columns(dataset)
         dataset = self.interpolate_dataset(dataset)
         dataset = self.get_preprocessed_dataset(dataset)
         data = dataset["data"]
@@ -106,6 +107,44 @@ class SeverityDataset:
     ) -> pd.DataFrame:
         remove_chars = str.maketrans("", "", "'\"{}[]:,")
         dataset.columns = [column.translate(remove_chars) for column in dataset.columns]
+        return dataset
+
+    def process_date_columns(
+        self,
+        dataset: pd.DataFrame,
+    ) -> pd.DataFrame:
+        date_columns = []
+        for column in dataset.columns:
+            if pd.api.types.is_numeric_dtype(dataset[column]):
+                continue
+            try:
+                checked_column = pd.to_datetime(
+                    dataset[column],
+                    errors="coerce",
+                )
+                if checked_column.notna().any():
+                    date_columns.append(column)
+            except Exception:
+                continue
+
+        if not date_columns:
+            return dataset
+
+        for date_column in date_columns:
+            dataset[date_column] = pd.to_datetime(
+                dataset[date_column],
+                errors="coerce",
+            )
+            dataset[f"{date_column}_year"] = (
+                dataset[date_column].dt.year.fillna(0).astype(int)
+            )
+            dataset[f"{date_column}_month"] = (
+                dataset[date_column].dt.month.fillna(0).astype(int)
+            )
+            dataset[f"{date_column}_day"] = (
+                dataset[date_column].dt.day.fillna(0).astype(int)
+            )
+            dataset = dataset.drop(columns=[date_column])
         return dataset
 
     def get_columns_by_types(
