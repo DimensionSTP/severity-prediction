@@ -45,14 +45,14 @@ python main.py mode=train is_tuned={tuned or untuned} num_trials={num_trials}
 
 * end-to-end
 ```shell
-python main.py mode=test is_tuned={tuned or untuned} num_trials={num_trials} epoch={ckpt epoch}
+python main.py mode=test is_tuned={tuned or untuned} num_trials={num_trials}
 ```
 
 ### Prediction
 
 * end-to-end
 ```shell
-python main.py mode=predict is_tuned={tuned or untuned} num_trials={num_trials} epoch={ckpt epoch}
+python main.py mode=predict is_tuned={tuned or untuned} num_trials={num_trials}
 ```
 
 ### Examples of shell scipts
