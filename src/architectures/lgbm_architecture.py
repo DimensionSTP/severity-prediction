@@ -9,7 +9,7 @@ import pandas as pd
 from tqdm import tqdm
 
 from sklearn.model_selection import StratifiedKFold
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import roc_auc_score
 
 import lightgbm as lgb
 from lightgbm import plot_importance
