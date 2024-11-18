@@ -10,6 +10,7 @@ import pandas as pd
 from tqdm import tqdm
 
 from sklearn.model_selection import StratifiedKFold
+from sklearn.metrics import f1_score
 
 import xgboost as xgb
 
@@ -75,6 +76,22 @@ class XGBTuner:
                 json_file,
             )
 
+    def eval_metric(
+        self,
+        pred: np.ndarray,
+        dataset: xgb.DMatrix,
+    ) -> Tuple[str, float]:
+        label = dataset.get_label()
+        binary_pred = (pred > 0.5).astype(int)
+        metric = f1_score(
+            y_true=label,
+            y_pred=binary_pred,
+        )
+        return (
+            self.metric_name,
+            metric,
+        )
+
     def optuna_objective(
         self,
         trial: optuna.trial.Trial,
@@ -86,7 +103,6 @@ class XGBTuner:
                 choices=self.hparams.booster,
             )
         params["objective"] = self.objective_name
-        params["eval_metric"] = self.metric_name
         params["random_state"] = self.seed
         if self.hparams._lambda:
             params["lambda"] = trial.suggest_loguniform(
@@ -166,6 +182,8 @@ class XGBTuner:
                         "validation",
                     ),
                 ],
+                feval=self.eval_metric,
+                maximize=True,
                 early_stopping_rounds=self.early_stop,
             )
 
