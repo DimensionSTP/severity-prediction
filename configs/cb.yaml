@@ -28,7 +28,7 @@ scale_type: unscale
 num_folds: 5
 
 objective_name: Logloss
-metric_name: AUC
+metric_name: F1
 early_stop: 10
 
 model_name: CatBoost
