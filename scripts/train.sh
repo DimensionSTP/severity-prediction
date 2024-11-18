@@ -1,7 +1,7 @@
 #!/bin/bash
 
 config_names="lgbm xgb cb"
-is_tuned="untuned"
+is_tuned="tuned"
 num_trials=100
 
 for config_name in $config_names
