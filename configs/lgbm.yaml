@@ -35,7 +35,7 @@ model_name: LightGBM
 dataset_name: severity_features
 mode: train
 
-is_tuned: untuned
+is_tuned: tuned
 direction: maximize
 num_trials: 100
 hparams_save_path: ${connected_dir}/hparams/${model_name}/${dataset_name}/${metric_name}-${direction}/${num_trials}_trials
