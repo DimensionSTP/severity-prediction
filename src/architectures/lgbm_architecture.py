@@ -1,3 +1,4 @@
+from typing import Tuple
 import os
 import json
 import warnings
@@ -9,7 +10,7 @@ import pandas as pd
 from tqdm import tqdm
 
 from sklearn.model_selection import StratifiedKFold
-from sklearn.metrics import roc_auc_score
+from sklearn.metrics import f1_score
 
 import lightgbm as lgb
 from lightgbm import plot_importance
@@ -59,6 +60,23 @@ class LGBMArchitecture:
         self.label_column_name = label_column_name
         self.submission_save_path = submission_save_path
 
+    def eval_metric(
+        self,
+        pred: np.ndarray,
+        dataset: lgb.Dataset,
+    ) -> Tuple[str, float, bool]:
+        label = dataset.get_label()
+        binary_pred = (pred > 0.5).astype(int)
+        metric = f1_score(
+            y_true=label,
+            y_pred=binary_pred,
+        )
+        return (
+            self.metric_name,
+            metric,
+            True,
+        )
+
     def train(
         self,
         data: pd.DataFrame,
@@ -84,14 +102,12 @@ class LGBMArchitecture:
                 )
             )
             params["objective"] = self.objective_name
-            params["metric"] = self.metric_name
             params["seed"] = self.seed
             params["verbosity"] = -1
         elif self.is_tuned == "untuned":
             params = {
                 "boosting_type": "gbdt",
                 "objective": self.objective_name,
-                "metric": self.metric_name,
                 "seed": self.seed,
                 "verbosity": -1,
             }
@@ -119,6 +135,7 @@ class LGBMArchitecture:
                     val_dataset,
                 ],
                 valid_names=("validation"),
+                feval=self.eval_metric,
                 callbacks=[
                     lgb.early_stopping(stopping_rounds=self.early_stop),
                     wandb_callback(),
@@ -138,7 +155,7 @@ class LGBMArchitecture:
                 num_iteration=model.best_iteration,
             )
 
-            metric_result = model.best_score["validation"][params["metric"]]
+            metric_result = model.best_score["validation"][self.metric_name]
             metric_results.append(metric_result)
         avg_metric_result = np.mean(metric_results)
         print(f"average {self.metric_name}: {avg_metric_result}")
@@ -221,9 +238,10 @@ class LGBMArchitecture:
         for model_file in tqdm(model_files):
             model = lgb.Booster(model_file=f"{self.model_save_path}/{model_file}")
             pred = model.predict(data=data)
-            metric_result = roc_auc_score(
+            binary_pred = (pred > 0.5).astype(int)
+            metric_result = f1_score(
                 y_true=label,
-                y_score=pred,
+                y_pred=binary_pred,
             )
             metric_results.append(metric_result)
 
