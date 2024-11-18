@@ -10,8 +10,6 @@ import warnings
 os.environ["HYDRA_FULL_ERROR"] = "1"
 warnings.filterwarnings("ignore")
 
-import json
-
 import hydra
 from omegaconf import DictConfig
 
