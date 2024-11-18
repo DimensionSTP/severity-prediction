@@ -11,7 +11,7 @@ connected_dir: ${oc.env:CONNECTED_DIR}/${package_name}
 
 seed: 2024
 
-split_ratio: 1e-1
+split_ratio: 2e-1
 columns_mapping_file_path: metadata/columns_mapping.json
 is_all_features: False
 unusing_features:
