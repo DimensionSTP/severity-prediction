@@ -21,6 +21,7 @@ unusing_features:
   - admission_date
   - discharge_date
   - transfer_date
+  - discharge_to_admission_days
 label_encoder_path: label_encoders
 label_column_name: transfer_status
 scale_type: unscale
