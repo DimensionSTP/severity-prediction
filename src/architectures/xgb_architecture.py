@@ -1,3 +1,4 @@
+from typing import Tuple
 import os
 import json
 import warnings
@@ -9,6 +10,7 @@ import pandas as pd
 from tqdm import tqdm
 
 from sklearn.model_selection import StratifiedKFold
+from sklearn.metrics import f1_score
 
 import xgboost as xgb
 from xgboost import plot_importance
@@ -58,6 +60,22 @@ class XGBArchitecture:
         self.label_column_name = label_column_name
         self.submission_save_path = submission_save_path
 
+    def eval_metric(
+        self,
+        pred: np.ndarray,
+        dataset: xgb.DMatrix,
+    ) -> Tuple[str, float]:
+        label = dataset.get_label()
+        binary_pred = (pred > 0.5).astype(int)
+        metric = f1_score(
+            y_true=label,
+            y_pred=binary_pred,
+        )
+        return (
+            self.metric_name,
+            metric,
+        )
+
     def train(
         self,
         data: pd.DataFrame,
@@ -83,14 +101,12 @@ class XGBArchitecture:
                 )
             )
             params["objective"] = self.objective_name
-            params["eval_metric"] = self.metric_name
             params["random_state"] = self.seed
             params["verbose"] = -1
         elif self.is_tuned == "untuned":
             params = {
                 "booster": "gbtree",
                 "objective": self.objective_name,
-                "eval_metric": self.metric_name,
                 "random_state": self.seed,
                 "verbose": -1,
             }
@@ -125,6 +141,8 @@ class XGBArchitecture:
                         "validation",
                     ),
                 ],
+                feval=self.eval_metric,
+                maximize=True,
                 early_stopping_rounds=self.early_stop,
                 callbacks=[WandbCallback(log_model=True)],
             )
