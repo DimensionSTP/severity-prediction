@@ -27,6 +27,13 @@ CONNECTED_DIR={CONNECTED_DIR}
 USER_NAME={USER_NAME}
 ```
 
+### Preprocessing(split data)
+
+* end-to-end
+```shell
+python src/preprocessing/split_data.py
+```
+
 ### Model Hyper-Parameters Tuning
 
 * end-to-end
@@ -57,14 +64,34 @@ python main.py mode=predict is_tuned={tuned or untuned} num_trials={num_trials}
 
 ### Examples of shell scipts
 
+* preprocessing(split data)
+```shell
+bash scripts/split_data.sh
+```
+
+* tune
+```shell
+bash scripts/tune.sh
+```
+
 * train
 ```shell
 bash scripts/train.sh
 ```
 
+* test
+```shell
+bash scripts/test.sh
+```
+
 * predict
 ```shell
 bash scripts/predict.sh
+```
+
+* end to end(tune, train, test, predict)
+```shell
+bash scripts/end_to_end.sh
 ```
 
 
