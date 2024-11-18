@@ -85,6 +85,11 @@ class CBArchitecture:
             params["eval_metric"] = self.metric_name
             params["random_seed"] = self.seed
             params["verbose"] = False
+
+            if params["bootstrap_type"] == "Bayesian":
+                del params["subsample"]
+            else:
+                del params["bagging_temperature"]
         elif self.is_tuned == "untuned":
             params = {
                 "loss_function": self.objective_name,
