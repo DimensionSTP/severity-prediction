@@ -10,6 +10,7 @@ import pandas as pd
 from tqdm import tqdm
 
 from sklearn.model_selection import StratifiedKFold
+from sklearn.metrics import f1_score
 
 import lightgbm as lgb
 
@@ -75,6 +76,23 @@ class LGBMTuner:
                 json_file,
             )
 
+    def eval_metric(
+        self,
+        pred: np.ndarray,
+        dataset: lgb.Dataset,
+    ) -> Tuple[str, float, bool]:
+        label = dataset.get_label()
+        binary_pred = (pred > 0.5).astype(int)
+        metric = f1_score(
+            y_true=label,
+            y_pred=binary_pred,
+        )
+        return (
+            self.metric_name,
+            metric,
+            True,
+        )
+
     def optuna_objective(
         self,
         trial: optuna.trial.Trial,
@@ -82,7 +100,6 @@ class LGBMTuner:
         params = dict()
         params["boosting_type"] = "gbdt"
         params["objective"] = self.objective_name
-        params["metric"] = self.metric_name
         params["seed"] = self.seed
         params["verbosity"] = -1
         if self.hparams.learning_rate:
@@ -203,10 +220,11 @@ class LGBMTuner:
                     val_dataset,
                 ],
                 valid_names=("validation"),
+                feval=self.eval_metric,
                 callbacks=[lgb.early_stopping(stopping_rounds=self.early_stop)],
             )
 
-            metric_result = model.best_score["validation"][params["metric"]]
+            metric_result = model.best_score["validation"][self.metric_name]
             metric_results.append(metric_result)
         score = np.mean(metric_results)
         return score
