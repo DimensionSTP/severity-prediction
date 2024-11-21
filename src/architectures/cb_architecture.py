@@ -203,9 +203,7 @@ class CBArchitecture:
             exist_ok=True,
         )
 
-        plt.savefig(
-            f"{self.plt_save_path}/num_folds={self.num_folds}-metric_result={avg_metric_result}.png"
-        )
+        plt.savefig(f"{self.plt_save_path}/metric_result={avg_metric_result}.png")
 
     def test(
         self,
@@ -313,6 +311,6 @@ class CBArchitecture:
         )
 
         submission.to_csv(
-            f"{self.submission_save_path}/{self.save_detail}.csv",
+            f"{self.submission_save_path}.csv",
             index=False,
         )
