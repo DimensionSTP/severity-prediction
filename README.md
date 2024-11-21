@@ -25,6 +25,14 @@ pip install -r requirements.txt
 PROJECT_DIR={PROJECT_DIR}
 CONNECTED_DIR={CONNECTED_DIR}
 USER_NAME={USER_NAME}
+API_KEY={API_KEY}
+```
+
+### Preprocessing(generate columns mapping)
+
+* end-to-end
+```shell
+python src/preprocessing/generate_columns_mapping.py
 ```
 
 ### Preprocessing(split data)
