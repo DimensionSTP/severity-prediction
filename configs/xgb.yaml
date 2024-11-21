@@ -48,5 +48,7 @@ plt_save_path: ${connected_dir}/feature_importance/${save_detail}
 submission_save_path: ${connected_dir}/submission/${save_detail}
 
 user_name: ${oc.env:USER_NAME}
+api_key: ${oc.env:API_KEY}
+
 run_name: ${project_name}
 work_dir: ${hydra:runtime.cwd}
