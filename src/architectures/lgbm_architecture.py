@@ -317,6 +317,6 @@ class LGBMArchitecture:
         )
 
         submission.to_csv(
-            f"{self.submission_save_path}.csv",
+            f"{self.submission_save_path}/prediction.csv",
             index=False,
         )
