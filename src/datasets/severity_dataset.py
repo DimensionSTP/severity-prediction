@@ -174,6 +174,7 @@ class SeverityDataset:
     def process_date_columns(
         self,
         dataset: pd.DataFrame,
+        date_columns: List[str],
     ) -> pd.DataFrame:
         date_columns = []
         for column in dataset.columns:
