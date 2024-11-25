@@ -13,6 +13,10 @@ seed: 2024
 
 split_ratio: 2e-1
 columns_mapping_file_path: metadata/columns_mapping.json
+timedelta_features:
+  diagnosis_interval:
+    - symptom_onset_date
+    - diagnosis_date
 is_all_features: False
 unusing_features:
   - patient_id
