@@ -176,20 +176,6 @@ class SeverityDataset:
         dataset: pd.DataFrame,
         date_columns: List[str],
     ) -> pd.DataFrame:
-        date_columns = []
-        for column in dataset.columns:
-            if pd.api.types.is_numeric_dtype(dataset[column]):
-                continue
-            try:
-                checked_column = pd.to_datetime(
-                    dataset[column],
-                    errors="coerce",
-                )
-                if checked_column.notna().any():
-                    date_columns.append(column)
-            except Exception:
-                continue
-
         if not date_columns:
             return dataset
 
