@@ -45,12 +45,24 @@ class SeverityDataset:
 
     def __call__(self) -> Dict[str, Any]:
         dataset = self.load_dataset()
-        dataset = self.map_columns(dataset)
-        dataset = self.select_features(dataset)
-        dataset = self.preprocess_certain_features(dataset)
-        dataset = self.process_date_columns(dataset)
-        dataset = self.interpolate_dataset(dataset)
-        dataset = self.get_preprocessed_dataset(dataset)
+        dataset = self.map_columns(dataset=dataset)
+
+        date_columns = self.get_date_columns(dataset=dataset)
+
+        dataset = self.get_timedelta_features(
+            dataset=dataset,
+            date_columns=date_columns,
+        )
+        dataset = self.select_features(dataset=dataset)
+        dataset = self.preprocess_certain_features(dataset=dataset)
+        dataset = self.process_date_columns(
+            dataset=dataset,
+            date_columns=date_columns,
+        )
+        dataset = self.interpolate_dataset(dataset=dataset)
+        dataset = self.encode_categorical_features(dataset=dataset)
+        dataset = self.get_preprocessed_dataset(dataset=dataset)
+
         data = dataset["data"]
         label = dataset["label"]
         return {
