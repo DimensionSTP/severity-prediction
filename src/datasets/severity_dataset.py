@@ -238,7 +238,8 @@ class SeverityDataset:
             exist_ok=True,
         )
 
-        _, categorical_columns = self.get_columns_by_types(dataset)
+        columns = self.get_columns_by_types(dataset)
+        categorical_columns = columns["categorical_columns"]
         for column in categorical_columns:
             label_encoder_file_path = f"{self.label_encoder_path}/{column}_encoder.pkl"
             try:
