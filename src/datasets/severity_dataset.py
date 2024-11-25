@@ -16,6 +16,7 @@ class SeverityDataset:
         data_path: str,
         dataset_name: str,
         columns_mapping_file_path: str,
+        timedelta_features: Dict[str, List[str]],
         is_all_features: bool,
         unusing_features: List[str],
         label_encoder_path: str,
@@ -31,6 +32,7 @@ class SeverityDataset:
         self.data_path = data_path
         self.dataset_name = dataset_name
         self.columns_mapping_file_path = columns_mapping_file_path
+        self.timedelta_features = timedelta_features
         self.is_all_features = is_all_features
         self.unusing_features = unusing_features
         self.label_encoder_path = label_encoder_path
