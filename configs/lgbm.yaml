@@ -16,6 +16,8 @@ columns_mapping_file_path: metadata/columns_mapping.json
 is_all_features: False
 unusing_features:
   - patient_id
+  - symptom_onset_date
+  - diagnosis_date
   - admission_date
   - discharge_date
   - transfer_date
