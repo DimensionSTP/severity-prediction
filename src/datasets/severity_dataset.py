@@ -91,6 +91,53 @@ class SeverityDataset:
         dataset = dataset.rename(columns=columns_mapping)
         return dataset
 
+    def get_date_columns(
+        self,
+        dataset: pd.DataFrame,
+    ) -> List[str]:
+        is_date_column = ~dataset.apply(pd.api.types.is_numeric_dtype) & dataset.apply(
+            lambda col: pd.to_datetime(col, errors="coerce").notna().any()
+        )
+        date_columns = list(dataset.columns[is_date_column])
+        return date_columns
+
+    def get_timedelta_features(
+        self,
+        dataset: pd.DataFrame,
+        date_columns: List[str],
+    ) -> pd.DataFrame:
+        if not date_columns:
+            return dataset
+
+        filtered_features = {
+            key: columns
+            for key, columns in self.timedelta_features.items()
+            if all(column in date_columns for column in columns)
+        }
+
+        date_features = [
+            column for columns in filtered_features.values() for column in columns
+        ]
+        dataset[date_features] = dataset[date_features].apply(
+            pd.to_datetime,
+            errors="coerce",
+        )
+
+        timedelta_features = {
+            key: (dataset[columns[1]] - dataset[columns[0]]).dt.days
+            for key, columns in filtered_features.items()
+        }
+
+        dataset = pd.concat(
+            [
+                dataset,
+                pd.DataFrame(timedelta_features),
+            ],
+            axis=1,
+        )
+
+        return dataset
+
     def select_features(
         self,
         dataset: pd.DataFrame,
