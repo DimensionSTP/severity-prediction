@@ -3,6 +3,7 @@ mode: ${mode}
 data_path: ${connected_dir}/data
 dataset_name: ${dataset_name}
 columns_mapping_file_path: ${connected_dir}/${columns_mapping_file_path}
+timedelta_features: ${timedelta_features}
 is_all_features: ${is_all_features}
 unusing_features: ${unusing_features}
 label_encoder_path: ${connected_dir}/${label_encoder_path}
