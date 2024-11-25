@@ -179,21 +179,40 @@ class SeverityDataset:
         if not date_columns:
             return dataset
 
-        for date_column in date_columns:
-            dataset[date_column] = pd.to_datetime(
-                dataset[date_column],
-                errors="coerce",
-            )
-            dataset[f"{date_column}_year"] = (
-                dataset[date_column].dt.year.fillna(0).astype(int)
-            )
-            dataset[f"{date_column}_month"] = (
-                dataset[date_column].dt.month.fillna(0).astype(int)
-            )
-            dataset[f"{date_column}_day"] = (
-                dataset[date_column].dt.day.fillna(0).astype(int)
-            )
-            dataset = dataset.drop(columns=[date_column])
+        date_features = [column for column in date_columns if column in dataset.columns]
+
+        dataset[date_features] = dataset[date_features].apply(
+            pd.to_datetime,
+            errors="coerce",
+        )
+
+        year_dataset = dataset[date_features].apply(
+            lambda col: col.dt.year.fillna(0).astype(int)
+        )
+        month_dataset = dataset[date_features].apply(
+            lambda col: col.dt.month.fillna(0).astype(int)
+        )
+        day_dataset = dataset[date_features].apply(
+            lambda col: col.dt.day.fillna(0).astype(int)
+        )
+
+        year_dataset.columns = [
+            f"{date_feature}_year" for date_feature in date_features
+        ]
+        month_dataset.columns = [
+            f"{date_feature}_month" for date_feature in date_features
+        ]
+        day_dataset.columns = [f"{date_feature}_day" for date_feature in date_features]
+
+        dataset = pd.concat(
+            [
+                dataset.drop(columns=date_features),
+                year_dataset,
+                month_dataset,
+                day_dataset,
+            ],
+            axis=1,
+        )
         return dataset
 
     def get_columns_by_types(
