@@ -15,6 +15,7 @@
 *.tar
 *.tar.gz
 *.log
+*.bin
 *__pycache__
 logs/runs/
 logs/wandb/
